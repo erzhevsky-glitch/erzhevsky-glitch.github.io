@@ -149,6 +149,15 @@ footer{padding:26px 0 40px;color:var(--ink-3);font-size:14px;display:flex;flex-w
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
 .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+.maxdlg{position:fixed;inset:0;z-index:60;background:rgba(27,26,31,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.maxdlg[hidden]{display:none}
+.maxdlg-card{position:relative;background:var(--paper);color:var(--ink);border-radius:var(--r);padding:28px 24px 24px;max-width:420px;width:100%;box-shadow:0 30px 60px -30px rgba(0,0,0,.5)}
+.maxdlg-card h3{font:700 22px/1.2 var(--display);margin:0 0 10px}
+.maxdlg-hint{color:var(--ink-2);font-size:15px;line-height:1.5;margin:0 0 14px}
+.maxdlg-msg{background:var(--soft);border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.45;margin-bottom:18px;user-select:all}
+.maxdlg-go{width:100%;justify-content:center}
+.maxdlg-x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:28px;line-height:1;color:var(--ink-3);cursor:pointer;padding:4px 8px}
+.maxdlg-x:hover{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -252,9 +261,33 @@ footer{padding:26px 0 40px;color:var(--ink-3);font-size:14px;display:flex;flex-w
   const ctaHtml = links.map((l, i) => `<a class="btn ${i === 0 ? 'btn-main' : 'btn-ghost'}" href="${esc(l.href)}" target="_blank" rel="noopener" ${l.copy ? 'data-copy' : ''}>${ico[l.k]}${l.label}</a>`).join('') || '<span>Добавьте мессенджер: «добавь в витрину Telegram …»</span>';
   document.querySelectorAll('[data-cta]').forEach((el) => { el.innerHTML = ctaHtml; });
   const toast = (t) => { const el = $('toast'); el.textContent = t; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3200); };
+  const copyText = (t) => {
+    const fallback = () => { const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0'; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (_) {} ta.remove(); return ok; };
+    try { if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(t).catch(fallback); return true; } } catch (_) {}
+    return fallback();
+  };
+  const maxDlg = document.createElement('div');
+  maxDlg.className = 'maxdlg'; maxDlg.hidden = true;
+  maxDlg.innerHTML = `<div class="maxdlg-card" role="dialog" aria-modal="true" aria-labelledby="maxdlg-t">
+      <button class="maxdlg-x" type="button" aria-label="Закрыть">×</button>
+      <h3 id="maxdlg-t">Текст скопирован</h3>
+      <p class="maxdlg-hint">MAX не подставляет сообщение сам. Откройте чат и вставьте текст в поле ввода: на телефоне – долгое нажатие → «Вставить», на компьютере – Ctrl+V.</p>
+      <div class="maxdlg-msg"></div>
+      <a class="btn btn-main maxdlg-go" target="_blank" rel="noopener">${ico.max}Открыть чат в MAX</a>
+    </div>`;
+  document.body.appendChild(maxDlg);
+  maxDlg.querySelector('.maxdlg-msg').textContent = msg;
+  const closeMax = () => { maxDlg.hidden = true; };
+  maxDlg.addEventListener('click', (e) => { if (e.target === maxDlg || e.target.closest('.maxdlg-x') || e.target.closest('.maxdlg-go')) closeMax(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMax(); });
   document.addEventListener('click', (e) => {
     const a = e.target.closest('[data-copy]'); if (!a) return;
-    try { navigator.clipboard.writeText(msg); toast('Текст сообщения скопирован – вставьте его в чат MAX'); } catch (_) {}
+    e.preventDefault();
+    const ok = copyText(msg);
+    maxDlg.querySelector('#maxdlg-t').textContent = ok ? 'Текст скопирован' : 'Скопируйте текст';
+    maxDlg.querySelector('.maxdlg-go').href = a.getAttribute('href');
+    maxDlg.hidden = false;
+    maxDlg.querySelector('.maxdlg-go').focus();
   });
 
   // живой телефон
