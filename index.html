@@ -12,13 +12,13 @@
 <meta name="color-scheme" content="light">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prata&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Витрина веб-мастера. Палитра задаётся тремя переменными в :root – их меняет сборка (vitrina.mjs). */
 :root{
-  --accent:#DD4B33; --ink:#1B1A1F; --soft:#F7F1EE;
+  --accent:#8E1B3A; --ink:#231A1D; --soft:#F6EEEC;
   --paper:#FFFFFF; --line:#E7E8EE; --ink-2:#5B5D68; --ink-3:#8E909A;
-  --display:"Unbounded",system-ui,sans-serif; --body:"Golos Text",system-ui,sans-serif;
+  --display:"Prata",Georgia,serif; --body:"Golos Text",system-ui,sans-serif;
   --r:22px;
 }
 *{box-sizing:border-box}
@@ -158,6 +158,9 @@ footer{padding:26px 0 40px;color:var(--ink-3);font-size:14px;display:flex;flex-w
 .maxdlg-go{width:100%;justify-content:center}
 .maxdlg-x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:28px;line-height:1;color:var(--ink-3);cursor:pointer;padding:4px 8px}
 .maxdlg-x:hover{color:var(--ink)}
+.theme-bordo{}
+h1,h2,h3,.brand,.facts b,.price .sum,.maxdlg-card h3{font-weight:400;letter-spacing:-.01em}
+.brand i,.hello b,.chat .who b,.steps li::before{font-family:var(--body)}
 </style>
 </head>
 <body>
